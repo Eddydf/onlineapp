@@ -5,6 +5,12 @@ import time
 import json
 import csv
 import bot_blaze_double as g
+from flask import Flask
+app = Flask(__name__)
+
+@app.route('/')
+def hello_world():
+    return 'Hello, World!'
 
 
 class WebScraper:
