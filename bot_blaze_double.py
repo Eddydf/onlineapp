@@ -4,23 +4,19 @@ import telebot
 import time
 import json
 import csv
-import bot_blaze_double as g
-from flask import Flask
-app = Flask(__name__)
 
-@app.get('/')
 
 class WebScraper:
-
+    
     def __init__(self):
         # EDIT!
         self.game = "Blaze Double"
-        self.token = '6661150445:AAGbdnvrREdRzZadudgKJ_5FydmcHVsenOo'
-        self.chat_id = '-1001563995346'
-        self.url_API = 'http://api.mxvinvest.com:63000/blaze-double'
-        self.gales = 2
+        self.token = "6661150445:AAGbdnvrREdRzZadudgKJ_5FydmcHVsenOo" # config
+        self.chat_id = "-1001563995346" # config
+        self.url_API = "https://blaze-1.com/api/roulette_games/recent"
+        self.gale = 1
         self.protection = True
-        self.link = '[Clique aqui!](blaze.com/r/0aJYR6)'
+        self.link = "[Clique aqui!](blaze-1.com/r/w2qDo)"
 
         # MAYBE EDIT!
         self.win_results = 0
@@ -32,19 +28,21 @@ class WebScraper:
         # NO EDIT!
         self.count = 0
         self.analisar = True
-        self.direction_color = 'None'
+        self.direction_color = "None"
         self.message_delete = False
-        self.bot = telebot.TeleBot(token=self.token, parse_mode='MARKDOWN')
+        self.bot = telebot.TeleBot(token=self.token, parse_mode="MARKDOWN")
         self.date_now = str(datetime.datetime.now().strftime("%d/%m/%Y"))
         self.check_date = self.date_now
 
     def restart(self):
         if self.date_now != self.check_date:
-            print('Reiniciando bot!')
+            print("Reiniciando bot!")
             self.check_date = self.date_now
 
             self.bot.send_sticker(
-                self.chat_id, sticker='CAACAgEAAxkBAAEBbJJjXNcB92-_4vp2v0B3Plp9FONrDwACvgEAAsFWwUVjxQN4wmmSBCoE')
+                self.chat_id,
+                sticker="CAACAgEAAxkBAAEBbJJjXNcB92-_4vp2v0B3Plp9FONrDwACvgEAAsFWwUVjxQN4wmmSBCoE",
+            )
             self.results()
 
             # ZERA OS RESULTADOS
@@ -56,86 +54,101 @@ class WebScraper:
             time.sleep(10)
 
             self.bot.send_sticker(
-                self.chat_id, sticker='CAACAgEAAxkBAAEBPQZi-ziImRgbjqbDkPduogMKzv0zFgACbAQAAl4ByUUIjW-sdJsr6CkE')
+                self.chat_id,
+                sticker="CAACAgEAAxkBAAEBPQZi-ziImRgbjqbDkPduogMKzv0zFgACbAQAAl4ByUUIjW-sdJsr6CkE",
+            )
             self.results()
             return True
         else:
             return False
 
     def results(self):
-
         if self.win_results + self.branco_results + self.loss_results != 0:
-            a = 95.2 / (self.win_results + self.branco_results +
-                        self.loss_results) * (self.win_results + self.branco_results)
+            a = (
+                100
+                / (self.win_results + self.branco_results + self.loss_results)
+                * (self.win_results + self.branco_results)
+            )
         else:
             a = 0
-        self.win_hate = (f'{a:,.2f}%')
+        self.win_hate = f"{a:,.2f}%"
 
-        self.bot.send_message(chat_id=self.chat_id, text=(f'''
+        self.bot.send_message(
+            chat_id=self.chat_id,
+            text=(
+                f"""
 
-► PLACAR GERAL = ✅{self.win_results} | ⚪️{self.branco_results} | 🚫{self.loss_results} 
+► PLACAR = ✅{self.win_results} | ⚪️{self.branco_results} | 🚫{self.loss_results} 
 ► Consecutivas = {self.max_hate}
 ► Assertividade = {self.win_hate}
     
-    '''))
+    """
+            ),
+        )
         return
 
     def alert_sinal(self):
         message_id = self.bot.send_message(
-            self.chat_id, text='''
+            self.chat_id,
+            text="""
 ⚠️ ANALISANDO, FIQUE ATENTO!!!
-''').message_id
+""",
+        ).message_id
         self.message_ids = message_id
         self.message_delete = True
         return
 
     def alert_gale(self):
         self.message_ids = self.bot.send_message(
-            self.chat_id, text=f'''⚠️ Vamos para o {self.count}ª GALE''').message_id
+            self.chat_id, text=f"""⚠️ Vamos para o {self.count}ª GALE"""
+        ).message_id
         self.message_delete = True
         return
 
     def delete(self):
         if self.message_delete == True:
-            self.bot.delete_message(chat_id=self.chat_id,
-                                    message_id=self.message_ids)
+            self.bot.delete_message(chat_id=self.chat_id, message_id=self.message_ids)
             self.message_delete = False
 
     def send_sinal(self):
         self.analisar = False
-        self.bot.send_message(chat_id=self.chat_id, text=(f'''
+        self.bot.send_message(
+            chat_id=self.chat_id,
+            text=(
+                f"""
 
 🎲 *ENTRADA CONFIRMADA!*
 
 🎰 Apostar no {self.direction_color}
 ⚪️ Proteger no Branco
-🔁 Fazer até {self.gales} gales
+🔁 Fazer até {self.gale} gale
 
-📱 *{self.game}* '''f'{self.link}''''
+📱 *{self.game}* """
+                f"{self.link}"
+                """
 
-    '''))
+    """
+            ),
+        )
         return
 
     def martingale(self, result):
-
         if result == "WIN":
             print(f"WIN")
             self.win_results += 1
             self.max_hate += 1
             # self.bot.send_sticker(self.chat_id, sticker='CAACAgEAAxkBAAEBuhtkFBbPbho5iUL3Cw0Zs2WBNdupaAACQgQAAnQVwEe3Q77HvZ8W3y8E')
-            self.bot.send_message(chat_id=self.chat_id,
-                                  text=(f'''✅✅✅ WIN ✅✅✅'''))
+            self.bot.send_message(chat_id=self.chat_id, text=(f"""✅✅✅ WIN ✅✅✅"""))
 
         elif result == "LOSS":
             self.count += 1
 
-            if self.count > self.gales:
+            if self.count > self.gale:
                 print(f"LOSS")
                 self.loss_results += 1
                 self.max_hate = 0
                 # self.bot.send_sticker(self.chat_id, sticker='CAACAgEAAxkBAAEBuh9kFBbVKxciIe1RKvDQBeDu8WfhFAACXwIAAq-xwEfpc4OHHyAliS8E')
-                self.bot.send_message(
-                    chat_id=self.chat_id, text=(f'''🚫🚫🚫 LOSS 🚫🚫🚫'''))
+                self.bot.send_message(chat_id=self.chat_id, text=(f"""🚫🚫🚫 LOSS 🚫🚫🚫"""))
 
             else:
                 print(f"Vamos para o {self.count}ª gale!")
@@ -147,8 +160,7 @@ class WebScraper:
             self.branco_results += 1
             self.max_hate += 1
             # self.bot.send_sticker(self.chat_id, sticker='CAACAgEAAxkBAAEBuiNkFBbYDjGessfawWa3v9i4Kj35sgACQAUAAmq0wEejZcySuMSbsC8E')
-            self.bot.send_message(chat_id=self.chat_id,
-                                  text=(f'''✅✅✅ BRANCO ✅✅✅'''))
+            self.bot.send_message(chat_id=self.chat_id, text=(f"""✅✅✅ RECEBA O BRANCO ✅✅✅"""))
 
         self.count = 0
         self.analisar = True
@@ -157,64 +169,72 @@ class WebScraper:
         return
 
     def check_results(self, results):
-
-        if results == 'V' and self.direction_color == '🔴':
-            self.martingale('WIN')
+        if results == "B" and self.protection == True:
+            self.martingale("BRANCO")
             return
-        elif results == 'V' and self.direction_color == '⚫️':
-            self.martingale('LOSS')
-            return
-
-        if results == 'P' and self.direction_color == '⚫️':
-            self.martingale('WIN')
-            return
-        elif results == 'P' and self.direction_color == '🔴':
-            self.martingale('LOSS')
+        elif results == "B" and self.protection == False:
+            self.martingale("LOSS")
             return
 
-        if results == 'B' and self.protection == True:
-            self.martingale('BRANCO')
+        if results == "B" and self.direction_color == "⚪️":
+            self.martingale("EMPATE")
             return
-        elif results == 'B' and self.protection == False:
-            self.martingale('LOSS')
+
+        elif results != "B" and self.direction_color == "⚪️":
+            self.martingale("LOSS")
+            return
+
+        if results == "V" and self.direction_color == "🔴":
+            self.martingale("WIN")
+            return
+        elif results == "V" and self.direction_color == "⚫️":
+            self.martingale("LOSS")
+            return
+
+        if results == "P" and self.direction_color == "⚫️":
+            self.martingale("WIN")
+            return
+        elif results == "P" and self.direction_color == "🔴":
+            self.martingale("LOSS")
             return
 
     def start(self):
         check = []
         while True:
             try:
-                self.date_now = str(
-                    datetime.datetime.now().strftime("%d/%m/%Y"))
+                self.date_now = str(datetime.datetime.now().strftime("%d/%m/%Y"))
 
                 results = []
                 time.sleep(1)
 
                 response = requests.get(self.url_API)
                 json_data = json.loads(response.text)
-                for i in json_data['results']:
-                    results.append(i)
+
+
+
+                for i in json_data:
+                    results.append(i['roll'])
 
                 if check != results:
                     check = results
                     self.delete()
                     self.estrategy(results)
 
-            except:
-                print("ERROR - 404!")
+            except Exception as e:
+                print("ERROR - 404!", e)
                 continue
 
     def estrategy(self, results):
-
         finalnum = results
         finalcor = []
 
         for i in results:
             if i >= 1 and i <= 7:
-                finalcor.append('V')
+                finalcor.append("V")
             elif i >= 8 and i <= 14:
-                finalcor.append('P')
+                finalcor.append("P")
             else:
-                finalcor.append('B')
+                finalcor.append("B")
 
         print(finalnum[0:10])
         print(finalcor[0:10])
@@ -225,51 +245,58 @@ class WebScraper:
 
         # EDITAR ESTRATÉGIAS
         elif self.analisar == True:
-
             # ESTRATÉGIAS COM BASE NO CSV
-            with open('estrategy.csv', newline='') as f:
+            with open("bot_blaze_estrategy.csv", newline="") as f:
                 reader = csv.reader(f)
 
                 ESTRATEGIAS = []
 
                 for row in reader:
                     string = str(row[0])
-                    split_string = string.split('=')
-                    values = list(split_string[0])
-                    values.reverse()
-                    dictionary = {'PADRAO': values, 'ENTRADA': split_string[1]}
-                    ESTRATEGIAS.append(dictionary)
+                    split_string = string.split("=")
 
-                for i in ESTRATEGIAS:
-                    if finalcor[0:len(i['PADRAO'])] == i['PADRAO']:
+                    lista = split_string[0].split("-")
+                    aposta = list(split_string[1])
 
-                        if i['ENTRADA'] == 'P':
-                            self.direction_color = '⚫️'
-                        elif i['ENTRADA'] == 'V':
-                            self.direction_color = '🔴'
-                        elif i['ENTRADA'] == 'B':
-                            self.direction_color = '⚪️'
+                    count = 0
+                    sinal = True
+                    estrategias = lista[::-1]
+                    
+                    for i in estrategias:
+                        if i == "X" or i == finalcor[count] or i == str(finalnum[count]):
+                            pass
+                        else:
+                            sinal = False
 
+                        count += 1
+
+                    if sinal == True:
+                        if aposta[0] == "P":
+                            self.direction_color = "⚫️"
+                        elif aposta[0] == "V":
+                            self.direction_color = "🔴"
+                        elif aposta[0] == "B":
+                            self.direction_color = "⚪️"
+
+                        print("Sinal encontrado", estrategias, self.direction_color)
                         self.send_sinal()
                         return
 
-                for i in ESTRATEGIAS:
-                    if finalcor[0:(len(i['PADRAO'])-1)] == i['PADRAO'][1:len(i['PADRAO'])]:
-                        print("ALERTA DE POSSÍVEL SINAL")
+                    count = 0
+                    alerta = True
+                    alertas = estrategias[1:]
+                    
+                    for i in alertas:
+                        if i == "X" or i == finalcor[count] or i == str(finalnum[count]):
+                            pass
+                        else:
+                            alerta = False
+                        count += 1
+
+                    if alerta == True:
+                        print("ALERTA POSSIVEL SINAL")
                         self.alert_sinal()
                         return
-
-            # ESTRATÉGIAS PERSONALIZADAS USANDO CORES E NUMEROS
-            if finalcor[0:3] == ['V', 'V', 'V'] and finalnum[3] >= 8:
-                self.direction_color = '⚫️'
-                self.send_sinal()
-                return
-
-            # ALERTA DAS ESTRATÉGIAS
-            if finalcor[0:2] == ['V', 'V'] and finalnum[3] >= 8:
-                print("ALERTA DE POSSÍVEL SINAL")
-                self.alert_sinal()
-                return
 
 
 scraper = WebScraper()
